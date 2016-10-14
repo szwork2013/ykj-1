@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gnet.app.customerTags.CustomerTagsMapper" >
+    
+    <insert id="insertCustomerTagsList">
+      insert into ykj_customer_tags (id, create_date, modify_date, tag_id, customer_id) values 
+      <foreach collection="tagsIds" item="tag" open="" separator="," close="">
+      (uuid(), #{date}, #{date}, #{tag}, #{customerId})
+      </foreach>
+    </insert>
+    
+              
+</mapper>

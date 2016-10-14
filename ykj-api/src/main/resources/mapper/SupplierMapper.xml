@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gnet.app.supplier.SupplierMapper" >
+    <resultMap id="BaseSupplierMap" type="com.gnet.app.supplier.Supplier" >
+        <id column="id" property="id" jdbcType="CHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="create_date" property="createDate" />
+        <result column="modify_date" property="modifyDate" />
+        <result column="supplier_name" property="supplierName" jdbcType="VARCHAR"/>
+        <result column="contact_name" property="contactName" jdbcType="VARCHAR"/>
+        <result column="contact_phone" property="contactPhone" jdbcType="VARCHAR"/>
+        <result column="contact_email" property="contactEmail" jdbcType="VARCHAR"/>
+        <result column="contact_address" property="contactAddress" jdbcType="VARCHAR"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="business_id" property="businessId" jdbcType="CHAR"/>
+    </resultMap>
+    
+    <select id="selectSuppliersAllList" resultMap="BaseSupplierMap">
+    select * from ykj_supplier
+    <where>
+    <if test="supplierName != null">
+    supplier_name like "${@com.gnet.utils.string.StringEscapeUtils@escapeSql(supplierName)}%"
+    </if>
+    <if test="contactName != null">
+    and contact_name like "${@com.gnet.utils.string.StringEscapeUtils@escapeSql(contactName)}%"
+    </if>
+    </where>
+    <if test="orderList != null">
+    <foreach item="orderItem" collection="orderList" open="order by " separator="," close="" >
+    {orderItem}
+    </foreach>
+    </if>
+    </select>
+    
+    <select id="selectSuppliersAll" resultMap="BaseSupplierMap">
+        select * from ykj_supplier
+    <where>
+    <if test="supplierName != null">
+    supplier_name like "${@com.gnet.utils.string.StringEscapeUtils@escapeSql(supplierName)}%"
+    </if>
+    <if test="contactName != null">
+    and contact_name like "${@com.gnet.utils.string.StringEscapeUtils@escapeSql(contactName)}%"
+    </if>
+    </where>
+    </select>
+    
+    <select id="isCreateExist" resultType="Integer">
+       select count(1) from ykj_supplier where business_id = #{businessId} and supplier_name = #{supplierName} and is_del = 0 
+    </select>
+    
+    <select id="isModifyExist" resultType="Integer">
+     select count(1) from ykj_supplier where business_id = #{businessId} and supplier_name != #{oldSupplierName} and supplier_name = #{supplierName}
+     and is_del = 0
+    </select>
+    
+</mapper>

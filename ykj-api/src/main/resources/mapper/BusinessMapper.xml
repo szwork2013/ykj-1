@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gnet.app.business.BusinessMapper" >
+    <resultMap id="BusinessMap" type="com.gnet.app.business.Business" >
+        <id column="id" property="id" jdbcType="CHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="create_date" property="createDate" />
+        <result column="modify_date" property="modifyDate" />
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="sale_brands" property="saleBrands" jdbcType="VARCHAR"/>
+        <result column="contact_number" property="contactNumber" jdbcType="VARCHAR"/>
+        <result column="service_call" property="serviceCall" jdbcType="VARCHAR"/>
+        <result column="contact_person" property="contactPerson" jdbcType="VARCHAR"/>
+        <result column="logo" property="logo" jdbcType="VARCHAR"/>
+        <result column="location" property="location" jdbcType="VARCHAR"/>
+        <result column="postcode" property="postcode" jdbcType="VARCHAR"/>
+        <result column="address" property="address" jdbcType="VARCHAR"/>
+        <result column="is_del" property="isDel" jdbcType="VARCHAR"/>
+        <result column="storeNum" property="storeNum" jdbcType="INTEGER" />
+    </resultMap>
+    
+    <select id="selectBusinessesAllList" resultMap="BusinessMap">
+     select yb.*, count(ys.name) storeNum from ykj_business yb
+     left join ykj_store ys on ys.business_id = yb.id
+     where yb.is_del = 0 and ys.is_del = 0
+    <if test="name != null">
+    and yb.name like "${@com.gnet.utils.string.StringEscapeUtils@escapeSql(name)}%"
+    </if>
+    <if test="saleBrands != null">
+    and yb.sale_brands like "${@com.gnet.utils.string.StringEscapeUtils@escapeSql(saleBrands)}%"
+    </if>
+    <if test="contactPerson != null">
+    and yb.contact_person like "${@com.gnet.utils.string.StringEscapeUtils@escapeSql(contactPerson)}%"
+    </if>
+    group by yb.id
+    <if test="orderList != null">
+    <foreach item="orderItem" collection="orderList" open="order by " separator="," close="" >
+    yb.#{orderItem}
+    </foreach>
+    </if>
+    </select>
+    
+    <select id="selectBusinessesAll" resultMap="BusinessMap">
+     select yb.*, count(ys.name) storeNum from ykj_business yb
+     left join ykj_store ys on ys.business_id = yb.id
+     where yb.is_del = 0 and ys.is_del = 0
+    <if test="name != null">
+    and yb.name like "${@com.gnet.utils.string.StringEscapeUtils@escapeSql(name)}%"
+    </if>
+    <if test="saleBrands != null">
+    and yb.sale_brands like "${@com.gnet.utils.string.StringEscapeUtils@escapeSql(saleBrands)}%"
+    </if>
+    <if test="contactPerson != null">
+    and yb.contact_person like "${@com.gnet.utils.string.StringEscapeUtils@escapeSql(contactPerson)}%"
+    </if>
+    group by yb.id
+    </select>
+    
+    <select id="isCreateExist" resultType="Integer">
+       select count(1) from ykj_business where name = #{name}
+    </select>
+    
+    <select id="isModifyExist" resultType="Integer">
+     select count(1) from ykj_business where name = #{name} and name != #{oldName}
+    </select>
+    
+    <select id="findById" resultMap="BusinessMap">
+     select * from ykj_business where id = #{id} and is_del = 0
+    </select>
+    
+    <update id="deleteById">
+    update ykj_business set modify_date = #{date}, is_del = 1 where id = #{id} 
+    </update>
+</mapper>

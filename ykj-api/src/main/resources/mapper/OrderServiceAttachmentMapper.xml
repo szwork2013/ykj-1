@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gnet.app.orderServiceAttachment.OrderServiceAttachmentMapper" >
+    <resultMap id="BaseOrderServiceAttachmentMap" type="com.gnet.app.orderServiceAttachment.OrderServiceAttachment" >
+        <id column="id" property="id" jdbcType="CHAR" />
+		<result column="attachment_filename" property="attachmentFilename" jdbcType="VARCHAR"/>
+		<result column="attachment_suffix" property="attachmentSuffix" jdbcType="CHAR"/>
+		<result column="remark" property="remark" jdbcType="VARCHAR"/>
+		<result column="create_date" property="createDate" />
+		<result column="attachment_root" property="attachmentRoot" jdbcType="VARCHAR"/>
+		<result column="modify_date" property="modifyDate" />
+		<result column="upload_person_id" property="uploadPersonId" jdbcType="CHAR"/>
+		<result column="attachment_size" property="attachmentSize" jdbcType="VARCHAR"/>
+		<result column="upload_date" property="uploadDate" jdbcType="DATE"/>
+    </resultMap>
+    
+	<update id="deleteById">
+        update ykj_order_service_attachment set operate_delete_status = ${@com.gnet.app.orderServiceAttachment.OrderServiceAttachment@DEL_TRUE}, modify_date = #{date}
+        where operate_delete_status = ${@com.gnet.app.orderServiceAttachment.OrderServiceAttachment@DEL_FALSE} and id = #{id}
+    </update>
+	
+	<update id="deleteByIds">
+        update ykj_order_service_attachment set operate_delete_status = ${@com.gnet.app.orderServiceAttachment.OrderServiceAttachment@DEL_TRUE}, modify_date = #{date}
+        where operate_delete_status = ${@com.gnet.app.orderServiceAttachment.OrderServiceAttachment@DEL_FALSE} 
+		and id in 
+		<foreach collection="ids" index="index" item="id" open=" (" separator=" ," close=")">
+			#{id}
+		</foreach>
+    </update>
+	
+	<select id="selectOrderServiceAttachmentsAllList" resultMap="BaseOrderServiceAttachmentMap">
+		select * from ykj_order_service_attachment 
+		where operate_delete_status = ${@com.gnet.app.orderServiceAttachment.OrderServiceAttachment@DEL_FALSE}
+		<if test=" orderList != null ">
+		<foreach collection="orderList" index="index" item="orderItem" open="order by " separator="," close="">
+			  #{orderItem}
+		</foreach>
+		</if>
+	</select>
+</mapper>

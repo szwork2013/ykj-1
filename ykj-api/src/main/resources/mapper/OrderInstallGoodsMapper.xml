@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gnet.app.orderInstallGoods.OrderInstallGoodsMapper" >
+    <resultMap id="BaseOrderInstallGoodsMap" type="com.gnet.app.orderInstallGoods.OrderInstallGoods" >
+        <id column="id" property="id" jdbcType="CHAR" />
+		<result column="order_install_service_id" property="orderInstallServiceId" jdbcType="CHAR"/>
+		<result column="install_num" property="installNum" jdbcType="INTEGER"/>
+		<result column="remark" property="remark" jdbcType="VARCHAR"/>
+		<result column="create_date" property="createDate" />
+		<result column="order_goods_id" property="orderGoodsId" jdbcType="CHAR"/>
+		<result column="modify_date" property="modifyDate" />
+		<result column="goodName" property="goodName" jdbcType="VARCHAR"></result>
+		<result column="goodModel" property="goodModel" jdbcType="VARCHAR"></result>
+		<result column="goodUnit" property="goodUnit" jdbcType="INTEGER"></result>
+		<result column="orderNum" property="orderNum" jdbcType="INTEGER"></result>
+		<result column="needInstallNum" property="needInstallNum" jdbcType="INTEGER"></result>
+		<result column="storeNow" property="storeNow" jdbcType="INTEGER"></result>
+    </resultMap>
+    
+   <insert id="batchSave">
+        insert into ykj_order_install_goods (id, create_date, modify_date, order_goods_id, order_install_service_id, install_num, remark) values
+        <foreach collection="serviceGoods" item="good" separator=",">
+            (uuid(), #{date}, #{date}, #{good.orderGoodsId}, #{serviceId}, #{good.installNum}, #{good.remark})
+        </foreach>
+   </insert>
+   
+   <select id="findAllList" resultMap="BaseOrderInstallGoodsMap">
+   select yoig.*, ysgt.store_now storeNow, ysg.name goodName, ysg.model goodModel, ysg.unit goodUnit, yog.order_goods_num orderNum, yog.need_install_num needInstallNum from ykj_order_install_goods yoig
+   left join ykj_order_goods yog on yog.id = yoig.order_goods_id
+   left join ykj_storage_goods ysg on ysg.id = yog.storage_goods_id
+   left join ykj_storage_goods_status ysgt on ysgt.id = ysg.id
+   where yoig.order_install_service_id = #{serviceId}
+   <if test="orderList != null">
+    <foreach item="orderItem" collection="orderList" open="order by " separator="," close="" >
+    {orderItem}
+    </foreach>
+   </if>
+   </select>
+   
+   <select id="selectAllList" resultMap="BaseOrderInstallGoodsMap">
+   select yoig.*, ysgt.store_now storeNow, ysg.name goodName, ysg.model goodModel, ysg.unit goodUnit, yog.order_goods_num orderNum, yog.need_install_num needInstallNum from ykj_order_install_goods yoig
+   left join ykj_order_goods yog on yog.id = yoig.order_goods_id
+   left join ykj_storage_goods ysg on ysg.id = yog.storage_goods_id
+   left join ykj_storage_goods_status ysgt on ysgt.id = ysg.id
+   where yoig.order_install_service_id = #{serviceId}
+   </select>
+   
+     
+   <delete id="deleteAll">
+   delete from ykj_order_install_goods where id in
+   <foreach item="good" collection="orderDeliverGoods" open="(" separator="," close=")" >
+   #{good.id}
+   </foreach>
+   </delete>
+</mapper>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gnet.app.codeword.CodewordMapper" >
+    <resultMap id="BaseCodewordMap" type="com.gnet.app.codeword.Codeword" >
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="value" property="value" jdbcType="VARCHAR" />
+        <result column="code" property="code" jdbcType="VARCHAR" />
+        <result column="codeword_type_id" property="codewordTypeId" jdbcType="VARCHAR" />
+        <result column="superid" property="superid" jdbcType="VARCHAR" />
+        <result column="code_level" property="codeLevel" jdbcType="VARCHAR" />
+        <result column="remark" property="remark" jdbcType="VARCHAR" />
+        <result column="code_flag" property="codeFlag" jdbcType="VARCHAR" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+    
+    <select id="selectCodewordsByBusiness" resultMap="BaseCodewordMap">
+        select sc.* from sc_codeword sc 
+        inner join sc_codeword_type sct on sct.id = sc.codeword_type_id 
+        inner join ykj_business_codeword ybc on ybc.codeword_id = sc.id 
+        <where>
+           <if test="businessId!=null">
+               ybc.business_id = #{businessId} 
+           </if>
+           <if test="typeValue!=null">
+               and sct.type_value = #{typeValue}  
+           </if>
+        </where>
+    </select>
+    
+    <select id="selectCodewordsByBusinessList" resultMap="BaseCodewordMap">
+        select sc.* from sc_codeword sc 
+        inner join sc_codeword_type sct on sct.id = sc.codeword_type_id 
+        inner join ykj_business_codeword ybc on ybc.codeword_id = sc.id 
+        <where>
+            <if test="businessId != null">
+                ybc.business_id = #{businessId} 
+            </if>
+            <if test="typeValue != null">
+                and sct.type_value = #{typeValue}  
+            </if>
+        </where>
+        <if test="orderList != null">
+	        <foreach item="orderItem" collection="orderList" open="order by " separator="," close="" >
+	            sc.#{orderItem}
+	        </foreach>
+        </if>
+    </select>
+    
+    <select id="findMaxCode" resultMap="BaseCodewordMap">
+        select code from sc_codeword where codeword_type_id = #{typeId} order by code desc limit 1
+    </select>
+</mapper>

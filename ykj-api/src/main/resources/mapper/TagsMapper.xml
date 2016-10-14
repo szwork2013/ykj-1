@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gnet.app.tags.TagsMapper" >
+    <resultMap id="BaseTagsMapper" type="com.gnet.app.tags.Tags" >
+        <id column="id" property="id" jdbcType="CHAR" />
+        <result column="create_date" property="createDate"/>
+        <result column="modify_date" property="modifyDate"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="level" property="level" jdbcType="INTEGER"/>
+        <result column="creator_id" property="creatorId" jdbcType="CHAR"/>
+        <result column="customerTagsId" property="customerTagsId" jdbcType="CHAR"/>
+    </resultMap>
+    
+    <insert id="insertTagsList">
+      insert into ykj_tags (id, create_date, modify_date, name, creator_id) values 
+      <foreach collection="newTagsNameList" item="tag" open="" separator="," close="">
+      	(uuid(), #{date}, #{date}, #{tag}, #{clerkId})
+      </foreach>
+    </insert>
+    
+    <select id="selectTagsbyName" resultMap="BaseTagsMapper">
+    select * from ykj_tags where name in 
+    <foreach collection="addList" item="name" open="(" separator="," close=")">
+    #{name}
+    </foreach>
+    </select>
+           
+    <select id="findCustomerTags" resultMap="BaseTagsMapper">
+    select yt.*, yct.id customerTagsId from ykj_tags yt
+    left join ykj_customer_tags yct on yct.tag_id = yt.id
+    left join ykj_customer yc on yc.id = yct.customer_id
+    where yc.id = #{customerId} and yc.is_del = 0
+    </select>
+    
+    <select id="findByCustomerTagId" resultMap="BaseTagsMapper">
+    select yt.*, yct.id customerTagsId from ykj_tags yt
+    left join ykj_customer_tags yct on yct.tag_id = yt.id
+    where yct.id = #{customerTagId} 
+    </select>
+            
+</mapper>

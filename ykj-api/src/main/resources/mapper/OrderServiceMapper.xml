@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gnet.app.orderService.OrderServiceMapper" >
+    <resultMap id="BaseOrderServiceMap" type="com.gnet.app.orderService.OrderSer" >
+        <id column="id" property="id" jdbcType="CHAR" />
+		<result column="customer_remark" property="customerRemark" jdbcType="VARCHAR"/>
+		<result column="service_time" property="serviceTime" />
+		<result column="star_level" property="starLevel" jdbcType="INTEGER"/>
+		<result column="clerk_id" property="clerkId" jdbcType="CHAR"/>
+		<result column="clerkName" property="clerkName" jdbcType="VARCHAR"/>
+		<result column="clerkPhone" property="clerkPhone" jdbcType="VARCHAR"/>
+		<result column="cost" property="cost" jdbcType="DECIMAL"/>
+		<result column="type" property="type" jdbcType="INTEGER"/>
+		<result column="service_position" property="servicePosition" jdbcType="VARCHAR"/>
+		<result column="is_clear" property="isClear" jdbcType="BIT"/>
+		<result column="private_remark" property="privateRemark" jdbcType="VARCHAR"/>
+		<result column="name" property="name" jdbcType="VARCHAR"/>
+		<result column="remark" property="remark" jdbcType="VARCHAR"/>
+		<result column="attachment_id" property="attachmentId" jdbcType="CHAR"/>
+		<result column="is_del" property="isDel" jdbcType="BIT"/>
+		<result column="is_finish" property="isFinish" jdbcType="BIT"/>
+		<result column="create_date" property="createDate" />
+		<result column="finance_expend_id" property="financeExpendId" jdbcType="CHAR"/>
+		<result column="modify_date" property="modifyDate" />
+		<result column="order_id" property="orderId" jdbcType="CHAR"/>
+		<result column="need_time" property="needTime" />
+		<result column="service_code" property="serviceCode" jdbcType="CHAR"/>
+    </resultMap>
+    	
+    <select id="findAll" resultMap="BaseOrderServiceMap">
+    select yos.*, yc.name clerkName, yc.phone clerkPhone from ykj_order_service yos
+    left join ykj_clerk yc on yc.id = yos.clerk_id
+    where yos.order_id = #{orderId} and yos.type = #{type} and yos.is_del = 0 and yc.is_del = 0
+    <if test="orderList != null">
+        <foreach item="orderItem" collection="orderList" open="order by " separator="," close="" >
+            #{orderItem}
+        </foreach>
+    </if>
+    </select>
+    
+    <select id="finishServiceNum" resultMap="BaseOrderServiceMap">
+    select * from ykj_order_service where order_id = #{orderId} and type = #{type} and is_finish = 1 and is_del = 0
+    </select>
+    
+    <select id="selectAllList" resultMap="BaseOrderServiceMap">
+    select yos.*, yc.name clerkName, yc.phone clerkPhone from ykj_order_service yos
+    left join ykj_clerk yc on yc.id = yos.clerk_id
+    where yos.order_id = #{orderId} and yos.type = #{type} and yos.is_del = 0 and yc.is_del = 0
+    </select>
+    
+    <select id="findById" resultMap="BaseOrderServiceMap">
+    select yos.*, yc.name clerkName, yc.phone clerkPhone from ykj_order_service yos
+    left join ykj_clerk yc on yc.id = yos.clerk_id
+    where yos.id = #{id} and yos.is_del = 0 and yc.is_del = 0
+    </select>	
+    	
+    <select id="isCreateExist" resultType="Integer">
+    select count(1) from ykj_order_service yos
+    left join ykj_order yo on yo.id = yos.order_id
+    where yos.service_code = #{serviceCode} and yo.business_id = #{businessId}
+    and yos.is_del = 0 and yo.is_del = 0
+    </select>
+    	
+    <select id="isModifyExist" resultType="Integer">
+    select count(1) from ykj_order_service yos
+    left join ykj_order yo on yo.id = yos.order_id
+    where yos.service_code = #{serviceCode} and service_code != #{oldServiceCode} and yo.business_id = #{businessId}
+    and yos.is_del = 0 and yo.is_del = 0
+    </select>
+    
+    <update id="deleteById">
+    update ykj_order_service set modify_date = #{date}, is_del = 1 where id = #{id} 
+    </update> 	
+    
+    <select id="selectServiceUnFinishWithoutMaintenance" resultMap="BaseOrderServiceMap">
+        select * from ykj_order_service where order_id = #{orderId} and 
+        (type = ${@com.gnet.app.orderService.OrderSer@TYPE_MEASURE} 
+        or type = ${@com.gnet.app.orderService.OrderSer@TYPE_DESIGN} 
+        or type = ${@com.gnet.app.orderService.OrderSer@TYPE_DELIVERY} 
+        or type = ${@com.gnet.app.orderService.OrderSer@TYPE_INSTALLATION}) 
+        and is_finish = ${@java.lang.Boolean@FALSE}
+        limit 1
+    </select>
+    	
+</mapper>

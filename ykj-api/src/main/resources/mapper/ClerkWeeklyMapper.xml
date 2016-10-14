@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gnet.app.clerkWeekly.ClerkWeeklyMapper" >
+    <resultMap id="BaseClerkWeeklyMapper" type="com.gnet.app.clerkWeekly.ClerkWeekly" >
+        <id column="id" property="id" jdbcType="CHAR" />
+        <result column="create_date" property="createDate" />
+        <result column="modify_date" property="modifyDate" />
+        <result column="week" property="week" jdbcType="CHAR"/>
+        <result column="day" property="day" jdbcType="DATE" />
+        <result column="plan" property="plan" jdbcType="VARCHAR"/>
+        <result column="real_work" property="realWork" jdbcType="VARCHAR"/>
+        <result column="is_finish" property="isFinish" jdbcType="BIT"/>
+        <result column="clerk_id" property="clerkId" jdbcType="CHAR" />
+    </resultMap>
+    
+    <select id="findByDayAndClerkId" resultMap="BaseClerkWeeklyMapper">
+        select * from ykj_clerk_weekly where day = #{day} and clerk_id = #{clerkId}
+    </select>
+    
+</mapper>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gnet.app.clerk.ClerkMapper" >
+    <resultMap id="BaseClerkMap" type="com.gnet.app.clerk.Clerk" >
+        <id column="id" property="id" jdbcType="CHAR" />
+        <result column="create_date" property="createDate" />
+        <result column="modify_date" property="modifyDate" />
+        <result column="office_id" property="officeId" jdbcType="CHAR" />
+        <result column="role_type" property="roleType" jdbcType="INTEGER" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="sex" property="sex" jdbcType="INTEGER" />
+        <result column="birthday" property="birthday" jdbcType="DATE" />
+        <result column="phone" property="phone" jdbcType="VARCHAR" />
+        <result column="phone_sec" property="phoneSec" jdbcType="VARCHAR" />
+        <result column="QQ" property="QQ" jdbcType="VARCHAR" />
+        <result column="wechat" property="wechat" jdbcType="VARCHAR" />
+        <result column="email" property="email" jdbcType="VARCHAR" />
+        <result column="photo" property="photo" jdbcType="VARCHAR" />
+        <result column="business_id" property="businessId" jdbcType="CHAR" />
+        <result column="store_id" property="storeId" jdbcType="CHAR" />
+        <result column="is_del" property="isDel" jdbcType="BIT"/>
+    </resultMap>
+    
+    <update id="softDeleteById">
+        update ykj_clerk set is_del = ${@com.gnet.app.clerk.Clerk@DEL_TRUE}, modify_date = #{date} 
+        where is_del = ${@com.gnet.app.clerk.Clerk@DEL_FALSE} and id = #{id}
+    </update>
+    
+    <select id="selectClerksUnderBusiness" resultMap="BaseClerkMap">
+        select * from ykj_clerk 
+        where is_del = ${@com.gnet.app.clerk.Clerk@DEL_FALSE}
+        <if test="name != null">
+            and name like '%${@com.gnet.utils.string.StringEscapeUtils@escapeSql(name)}%'
+        </if>
+        <if test="businessId != null">
+            and business_id = #{businessId}
+        </if>
+    </select>
+    
+    <select id="selectClerksListUnderBusiness" resultMap="BaseClerkMap">
+        select * from ykj_clerk 
+        where is_del = ${@com.gnet.app.clerk.Clerk@DEL_FALSE}
+        <if test="name != null">
+            and name like '%${@com.gnet.utils.string.StringEscapeUtils@escapeSql(name)}%'
+        </if>
+        <if test="businessId != null">
+            and business_id = #{businessId}
+        </if>
+        <if test="orderList != null">
+            <foreach item="orderItem" collection="orderList" open="order by " separator="," close="" >
+                #{orderItem}
+            </foreach>
+        </if>
+    </select>
+    
+    <select id="selectClerksUnderStore" resultMap="BaseClerkMap">
+        select * from ykj_clerk 
+        where is_del = ${@com.gnet.app.clerk.Clerk@DEL_FALSE}
+        <if test="name != null">
+            and name like '%${@com.gnet.utils.string.StringEscapeUtils@escapeSql(name)}%'
+        </if>
+        <if test="storeId != null">
+            and store_id = #{storeId}
+        </if>
+    </select>
+    
+     <select id="selectClerksListUnderStore" resultMap="BaseClerkMap">
+        select * from ykj_clerk 
+        where is_del = ${@com.gnet.app.clerk.Clerk@DEL_FALSE}
+        <if test="name != null">
+            and name like '%${@com.gnet.utils.string.StringEscapeUtils@escapeSql(name)}%'
+        </if>
+        <if test="storeId != null">
+            and store_id = #{storeId}
+        </if>
+        <if test="orderList != null">
+            <foreach item="orderItem" collection="orderList" open="order by " separator="," close="" >
+                #{orderItem}
+            </foreach>
+        </if>
+    </select>
+    
+    <select id="selectClerksListUnderOffice" resultMap="BaseClerkMap">
+        select * from ykj_clerk 
+        where is_del = ${@com.gnet.app.clerk.Clerk@DEL_FALSE}
+        <if test="officeId != null">
+            and office_id = #{officeId}
+        </if>
+    </select>
+    <select id="findAll" resultMap="BaseClerkMap">
+        select * from ykj_clerk where is_del = 0
+    </select>
+    
+    <select id="findOneById" parameterType="String" resultMap="BaseClerkMap">
+        select * from ykj_clerk where is_del = 0 and id = #{id}
+    </select>
+    
+    <select id="businessExistClerk" resultType="INTEGER">
+    select count(1) from ykj_clerk where business_id = #{id} and is_del = 0;
+    </select>
+    
+    <select id="storeExistClerk" resultType="INTEGER">
+    select count(1) from ykj_clerk where store_id = #{id} and is_del = 0;
+    </select>
+    
+</mapper>

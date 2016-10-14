@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gnet.app.orderGood.OrderGoodMapper" >
+    <resultMap id="BaseOrderGoodMap" type="com.gnet.app.orderGood.OrderGood" >
+        <id column="id" property="id" jdbcType="CHAR" />
+		<result column="reserved_goods" property="reservedGoods" jdbcType="INTEGER"/>
+		<result column="order_goods_num" property="orderGoodsNum" jdbcType="INTEGER"/>
+		<result column="init_position" property="initPosition" jdbcType="VARCHAR"/>
+		<result column="reserved_date" property="reservedDate" jdbcType="DATE"/>
+		<result column="remark" property="remark" jdbcType="VARCHAR"/>
+		<result column="need_deliver_num" property="needDeliverNum" jdbcType="INTEGER"/>
+		<result column="discount_rate" property="discountRate" jdbcType="DECIMAL"/>
+		<result column="strike_unit_price" property="strikeUnitPrice" jdbcType="DECIMAL"/>
+		<result column="need_install_num" property="needInstallNum" jdbcType="INTEGER"/>
+		<result column="out_goods_num" property="outGoodsNum" jdbcType="INTEGER"/>
+		<result column="create_date" property="createDate" />
+		<result column="modify_date" property="modifyDate" />
+		<result column="order_id" property="orderId" jdbcType="CHAR"/>
+		<result column="storage_goods_id" property="storageGoodsId" jdbcType="CHAR"/>
+		<result column="out_goods_num" property="outGoodsNum" jdbcType="INTEGER"/>
+		<result column="good_name" property="goodName" jdbcType="VARCHAR"/>
+		<result column="good_model" property="goodModel" jdbcType="VARCHAR"/>
+		<result column="supplier_name" property="supplierName" jdbcType="VARCHAR"/>
+    </resultMap>
+   
+   <insert id="insertAllOrderGoods">
+        insert into ykj_order_goods (id, create_date, modify_date, order_id, storage_goods_id, order_goods_num, discount_rate, strike_unit_price, reserved_goods, reserved_date, init_position, need_deliver_num, need_install_num, remark, out_goods_num) values
+        <foreach collection="goods" item="good" separator=",">
+            (uuid(), #{good.createDate}, #{good.modifyDate}, #{good.orderId}, #{good.storageGoodsId}, #{good.orderGoodsNum}, #{good.discountRate}, #{good.strikeUnitPrice}, #{good.reservedGoods}, #{good.reservedDate}, #{good.initPosition}, #{good.needDeliverNum}, #{good.needInstallNum}, #{good.remark}, #{good.outGoodsNum})
+        </foreach>
+   </insert>
+      
+   <update id="batchUpdateDeliverNum">
+	   <foreach collection="ordersGoods" item="good" open="" separator=";" close="">
+	   	update ykj_order_goods set modify_date = #{good.modifyDate}, need_deliver_num = #{good.needDeliverNum} where id = #{good.id}
+	   </foreach>
+   </update>
+   
+   <update id="updateAllOrderGoods">
+        <foreach collection="goods" item="good" separator=";">
+            update ykj_order_goods set modify_date = #{good.modifyDate}, order_goods_num = #{good.orderGoodsNum}, discount_rate = #{good.discountRate}, strike_unit_price = #{good.strikeUnitPrice},  reserved_goods = #{good.reservedGoods}, reserved_date = #{good.reservedDate}, init_position = #{good.initPosition}, need_deliver_num = #{good.needDeliverNum}, need_install_num = #{good.needInstallNum}, remark = #{good.remark}, out_goods_num = #{good.outGoodsNum} where id = #{good.id}
+        </foreach>
+   </update>
+   
+   <delete id="deleteByIds">
+        delete from ykj_order_goods 
+        where id in 
+        <foreach collection="ids" index="index" item="id" open=" (" separator=" ," close=")">
+            #{id}
+        </foreach>
+    </delete>
+   
+   <select id="selectAllUnderOrder" resultMap="BaseOrderGoodMap">
+        select * from ykj_order_goods where order_id = #{orderId}
+   </select>
+   
+   <select id="selectAllUnderOrderWithGoodInfo" resultMap="BaseOrderGoodMap">
+        select yog.*, ysg.name good_name, ysg.model good_model, ys.supplier_name supplier_name from ykj_order_goods yog
+        inner join ykj_storage_goods ysg on ysg.id = yog.storage_goods_id 
+        inner join ykj_supplier ys on ys.id = ysg.supplier_id 
+        where yog.order_id = #{orderId}
+        order by yog.create_date asc
+   </select>
+   
+   <select id="findAll" resultMap="BaseOrderGoodMap">
+        select yog.*, ysg.name good_name, ysg.model good_model from ykj_order_goods yog
+        inner join ykj_storage_goods ysg on ysg.id = yog.storage_goods_id 
+        where yog.order_id = #{orderId}
+        <if test="type == @com.gnet.app.orderService.OrderSer@TYPE_DELIVERY">
+        and yog.need_deliver_num > 0
+        </if>
+        <if test="type == @com.gnet.app.orderService.OrderSer@TYPE_INSTALLATION">
+        and yog.need_install_num > 0
+        </if>
+        <if test="orderList != null">
+        <foreach item="orderItem" collection="orderList" open="order by " separator="," close="" >
+        {orderItem}
+        </foreach>
+        </if>
+   </select>
+   
+  <select id="selectAllList" resultMap="BaseOrderGoodMap">
+        select yog.*, ysg.name good_name, ysg.model good_model from ykj_order_goods yog
+        inner join ykj_storage_goods ysg on ysg.id = yog.storage_goods_id 
+        where yog.order_id = #{orderId}
+        <if test="type == @com.gnet.app.orderService.OrderSer@TYPE_DELIVERY">
+        and yog.need_deliver_num > 0
+        </if>
+        <if test="type == @com.gnet.app.orderService.OrderSer@TYPE_INSTALLATION">
+        and yog.need_install_num > 0
+        </if>
+   </select>
+   
+   <select id="needServiceNum" resultType="Integer">
+   select count(1) from ykj_order_goods where order_id = #{orderId}
+   <if test="type == @com.gnet.app.orderService.OrderSer@TYPE_DELIVERY">
+   and need_deliver_num > 0
+   </if>
+   <if test="type == @com.gnet.app.orderService.OrderSer@TYPE_INSTALLATION">
+   and need_install_num > 0
+   </if>
+   </select>
+   
+   <select id="goodsNum" resultType="Integer">
+   select count(1) from ykj_order_goods where order_id = #{orderId}
+   </select>
+   
+</mapper>

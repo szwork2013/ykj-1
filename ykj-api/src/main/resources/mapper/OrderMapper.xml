@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gnet.app.order.OrderMapper" >
+    <resultMap id="BaseOrderMap" type="com.gnet.app.order.Order" >
+        <id column="id" property="id" jdbcType="CHAR" />
+		<result column="order_no" property="orderNo" jdbcType="VARCHAR"/>
+		<result column="customer_remark" property="customerRemark" jdbcType="VARCHAR"/>
+		<result column="address" property="address" jdbcType="VARCHAR"/>
+		<result column="price_before_discount" property="priceBeforeDiscount" jdbcType="DECIMAL"/>
+		<result column="order_creator_id" property="orderCreatorId" jdbcType="CHAR"/>
+		<result column="is_need_install" property="isNeedInstall" jdbcType="BOOLEAN"/>
+		<result column="is_need_measure" property="isNeedMeasure" jdbcType="BOOLEAN"/>
+		<result column="type" property="type" jdbcType="INTEGER"/>
+		<result column="phone_sec" property="phoneSec" jdbcType="VARCHAR"/>
+		<result column="order_date" property="orderDate" jdbcType="DATE"/>
+		<result column="is_need_delivery" property="isNeedDelivery" jdbcType="BOOLEAN"/>
+		<result column="private_remark" property="privateRemark" jdbcType="VARCHAR"/>
+		<result column="order_source" property="orderSource" jdbcType="INTEGER"/>
+		<result column="is_del" property="isDel" jdbcType="BOOLEAN"/>
+		<result column="order_responsible_id" property="orderResponsibleId" jdbcType="CHAR"/>
+		<result column="create_date" property="createDate" />
+		<result column="customer_id" property="customerId" jdbcType="CHAR"/>
+		<result column="price_after_discount" property="priceAfterDiscount" jdbcType="DECIMAL"/>
+		<result column="modify_date" property="modifyDate" />
+		<result column="business_id" property="businessId" jdbcType="CHAR"/>
+		<result column="strike_price" property="strikePrice" jdbcType="DECIMAL"/>
+		<result column="receipt_price" property="receiptPrice" jdbcType="DECIMAL"/>
+		<result column="is_need_design" property="isNeedDesign" jdbcType="BOOLEAN"/>
+		<result column="orderResponsibleName" property="orderResponsibleName" jdbcType="VARCHAR"/>
+		<result column="customerName" property="customerName" jdbcType="VARCHAR"/>
+		<result column="customerPhone" property="customerPhone" jdbcType="VARCHAR"/>
+		<result column="subscriptionIsFinish" property="subscriptionIsFinish" jdbcType="BIT"/>
+    </resultMap>
+    
+	<update id="deleteById">
+        update ykj_order set is_del = ${@com.gnet.app.order.Order@DEL_TRUE}, modify_date = #{date}
+        where is_del = ${@com.gnet.app.order.Order@DEL_FALSE} and id = #{id}
+    </update>
+	
+	<update id="deleteByIds">
+        update ykj_order set is_del = ${@com.gnet.app.order.Order@DEL_TRUE}, modify_date = #{date}
+        where is_del = ${@com.gnet.app.order.Order@DEL_FALSE} 
+		and id in 
+		<foreach collection="ids" index="index" item="id" open=" (" separator=" ," close=")">
+			#{id}
+		</foreach>
+    </update>
+	
+	<select id="selectOrdersPersonal" resultMap="BaseOrderMap">
+		select yo.*, yck.name as orderResponsibleName, yc.name as customerName, yc.phone as customerPhone, yop.is_finish as subscriptionIsFinish from ykj_order yo 
+		inner join ykj_customer yc on yc.id = yo.customer_id and yc.is_del = ${@com.gnet.app.customer.Customer@DEL_FALSE}
+		inner join ykj_clerk yck on yck.id = yo.order_responsible_id and yck.is_del = ${@com.gnet.app.clerk.Clerk@DEL_FALSE}
+		left join ykj_order_process yop on yop.order_id = yo.id and yop.type = ${@com.gnet.app.orderProcess.OrderProcess@STATUS_SUBSCRIPTION}
+		where yo.is_del = ${@com.gnet.app.order.Order@DEL_FALSE} and yo.order_responsible_id = #{clerkId}
+		<if test=" type != null ">
+		  and yo.type = #{type}
+		</if>
+		<if test=" orderSource != null ">
+		  and yo.order_source = #{orderSource}
+		</if>
+		<if test=" orderResponsibleName != null ">
+          and yck.name like '%${@com.gnet.utils.string.StringEscapeUtils@escapeSql(orderResponsibleName)}%'
+        </if>
+        <if test=" customerName != null ">
+          and yc.name like '%${@com.gnet.utils.string.StringEscapeUtils@escapeSql(customerName)}%'
+        </if>
+        <if test=" startOrderDate != null ">
+          and yo.order_date between #{startOrderDate} and #{endOrderDate}
+        </if>
+        <if test=" mutiSearchColumn != null ">
+          and concat_ws(',' ,yc.phone, yo.address, yo.order_no, yo.private_remark) like '${@com.gnet.utils.string.StringEscapeUtils@escapeSql(mutiSearchColumn)}%'
+        </if>
+        <if test="orderList != null">
+            <foreach item="orderItem" collection="orderList" open="order by " separator="," close="" >
+                #{orderItem}
+            </foreach>
+        </if>
+	</select>
+	
+	<select id="selectOrdersUnderStore" resultMap="BaseOrderMap">
+        select yo.*, yck.name as orderResponsibleName, yc.name as customerName, yc.phone as customerPhone, yop.is_finish as subscriptionIsFinish from ykj_order yo 
+        inner join ykj_customer yc on yc.id = yo.customer_id and yc.is_del = ${@com.gnet.app.customer.Customer@DEL_FALSE}
+        inner join ykj_clerk yck on yck.id = yo.order_responsible_id and yck.is_del = ${@com.gnet.app.clerk.Clerk@DEL_FALSE} and yck.store_id = #{storeId}
+        left join ykj_order_process yop on yop.order_id = yo.id and yop.type = ${@com.gnet.app.orderProcess.OrderProcess@STATUS_SUBSCRIPTION}
+        where yo.is_del = ${@com.gnet.app.order.Order@DEL_FALSE} 
+        <if test=" type != null ">
+          and yo.type = #{type}
+        </if>
+        <if test=" orderSource != null ">
+          and yo.order_source = #{orderSource}
+        </if>
+        <if test=" orderResponsibleName != null ">
+          and yck.name like '%${@com.gnet.utils.string.StringEscapeUtils@escapeSql(orderResponsibleName)}%'
+        </if>
+        <if test=" customerName != null ">
+          and yc.name like '%${@com.gnet.utils.string.StringEscapeUtils@escapeSql(customerName)}%'
+        </if>
+        <if test=" startOrderDate != null ">
+          and yo.order_date between #{startOrderDate} and #{endOrderDate}
+        </if>
+        <if test=" mutiSearchColumn != null ">
+          and concat_ws(',' ,yc.phone, yo.address, yo.order_no, yo.private_remark) like '${@com.gnet.utils.string.StringEscapeUtils@escapeSql(mutiSearchColumn)}%'
+        </if>
+        <if test="orderList != null">
+            <foreach item="orderItem" collection="orderList" open="order by " separator="," close="" >
+                #{orderItem}
+            </foreach>
+        </if>
+    </select>
+    
+    <select id="selectOrdersUnderBusiness" resultMap="BaseOrderMap">
+        select yo.*, yck.name as orderResponsibleName, yc.name as customerName, yc.phone as customerPhone, yop.is_finish as subscriptionIsFinish from ykj_order yo 
+        inner join ykj_customer yc on yc.id = yo.customer_id and yc.is_del = ${@com.gnet.app.customer.Customer@DEL_FALSE}
+        inner join ykj_clerk yck on yck.id = yo.order_responsible_id and yck.is_del = ${@com.gnet.app.clerk.Clerk@DEL_FALSE} and yck.business_id = #{businessId}
+        left join ykj_order_process yop on yop.order_id = yo.id and yop.type = ${@com.gnet.app.orderProcess.OrderProcess@STATUS_SUBSCRIPTION}
+        where yo.is_del = ${@com.gnet.app.order.Order@DEL_FALSE}
+        <if test=" type != null ">
+          and yo.type = #{type}
+        </if>
+        <if test=" orderSource != null ">
+          and yo.order_source = #{orderSource}
+        </if>
+        <if test=" orderResponsibleName != null ">
+          and yck.name like '%${@com.gnet.utils.string.StringEscapeUtils@escapeSql(orderResponsibleName)}%'
+        </if>
+        <if test=" customerName != null ">
+          and yc.name like '%${@com.gnet.utils.string.StringEscapeUtils@escapeSql(customerName)}%'
+        </if>
+        <if test=" startOrderDate != null ">
+          and yo.order_date between #{startOrderDate} and #{endOrderDate}
+        </if>
+        <if test=" mutiSearchColumn != null ">
+          and concat_ws(',' ,yc.phone, yo.address, yo.order_no, yo.private_remark) like '${@com.gnet.utils.string.StringEscapeUtils@escapeSql(mutiSearchColumn)}%'
+        </if>
+        <if test="orderList != null">
+            <foreach item="orderItem" collection="orderList" open="order by " separator="," close="" >
+                #{orderItem}
+            </foreach>
+        </if>
+    </select>
+    
+    <select id="selectTodayLastCreateOrder" resultMap="BaseOrderMap">
+        select order_no from ykj_order where create_date like '${today}%'
+        order by order_no desc 
+        limit 1
+    </select>
+    
+	
+</mapper>

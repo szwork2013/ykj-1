@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gnet.app.orderProcess.OrderProcessMapper" >
+    <resultMap id="BaseOrderProcessMap" type="com.gnet.app.orderProcess.OrderProcess" >
+        <id column="id" property="id" jdbcType="CHAR" />
+        <result column="is_finish" property="isFinish" jdbcType="BOOLEAN"/>
+        <result column="create_date" property="createDate" />
+        <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="modify_date" property="modifyDate" />
+        <result column="order_id" property="orderId" jdbcType="CHAR"/>
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR"/>
+        <result column="address" property="address" jdbcType="VARCHAR"/>
+    </resultMap>
+    
+    <insert id="insertAllOrderProcess">
+        insert into ykj_order_process(id, create_date, modify_date, type, order_id, is_finish) values 
+        <foreach collection="processes" item="process" separator=",">
+        (uuid(), #{process.createDate}, #{process.modifyDate}, #{process.type}, #{process.orderId}, #{process.isFinish})
+        </foreach>
+    </insert>
+    
+    <select id="selectAllWithOrdeInfo" resultMap="BaseOrderProcessMap">
+        select yop.*, yo.order_no as order_no, yo.address as address from ykj_order_process yop 
+        inner join ykj_order yo on yo.id = yop.order_id
+        where yo.id = #{orderId}
+    </select>
+    
+    <select id="findByOrderId" resultMap="BaseOrderProcessMap">
+    select * from ykj_order_process where order_id = #{orderId} and type = #{type}
+    </select>
+    
+</mapper>

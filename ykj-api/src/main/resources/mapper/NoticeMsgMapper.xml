@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gnet.app.noticeMsg.NoticeMsgMapper" >
+    <resultMap id="BaseNoticeMsgMap" type="com.gnet.app.noticeMsg.NoticeMsg" >
+        <id column="id" property="id" jdbcType="CHAR" />
+		<result column="notice_date" property="noticeDate" />
+		<result column="from_id" property="fromId" jdbcType="CHAR"/>
+		<result column="create_date" property="createDate" />
+		<result column="modify_date" property="modifyDate" />
+		<result column="content" property="content" jdbcType="VARCHAR"/>
+		<result column="notice_type" property="noticeType" jdbcType="INTEGER"/>
+		<result column="notice_method" property="noticeMethod" jdbcType="INTEGER"/>
+		<result column="is_del" property="isDel" jdbcType="BIT"/>
+    </resultMap>
+    
+    <update id="deleteById">
+    update ykj_notice_msg set modify_date = #{date}, is_del = 1 where id = #{id} 
+    </update> 
+    
+    <select id="findByFromId" resultMap="BaseNoticeMsgMap">
+    select * from ykj_notice_msg where from_id = #{id} and is_del= 0 
+    </select> 
+ 
+</mapper>

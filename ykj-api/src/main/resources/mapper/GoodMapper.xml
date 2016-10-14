@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gnet.app.good.GoodMapper" >
+    <resultMap id="BaseGoodMap" type="com.gnet.app.good.Good" >
+        <id column="id" property="id" jdbcType="CHAR" />
+		<result column="onsale_status" property="onsaleStatus" jdbcType="INTEGER"/>
+		<result column="color" property="color" jdbcType="VARCHAR"/>
+		<result column="status_type" property="statusType" jdbcType="INTEGER"/>
+		<result column="length" property="length" jdbcType="DECIMAL"/>
+		<result column="specification" property="specification" jdbcType="VARCHAR"/>
+		<result column="atom_unit" property="atomUnit" jdbcType="INTEGER"/>
+		<result column="weight" property="weight" jdbcType="DECIMAL"/>
+		<result column="type" property="type" jdbcType="VARCHAR"/>
+		<result column="unit" property="unit" jdbcType="INTEGER"/>
+		<result column="price" property="price" jdbcType="DECIMAL"/>
+		<result column="name" property="name" jdbcType="VARCHAR"/>
+		<result column="width" property="width" jdbcType="DECIMAL"/>
+		<result column="model" property="model" jdbcType="VARCHAR"/>
+		<result column="create_date" property="createDate" />
+		<result column="modify_date" property="modifyDate" />
+		<result column="supplier_id" property="supplierId" jdbcType="CHAR"/>
+		<result column="business_id" property="businessId" jdbcType="CHAR"/>
+		<result column="height" property="height" jdbcType="DECIMAL"/>
+    </resultMap>
+	
+	<select id="selectGoodsAll" resultMap="BaseGoodMap">
+		select * from ykj_storage_goods 
+		<where>
+		    <if test=" name != null ">
+                and name like '%${@com.gnet.utils.string.StringEscapeUtils@escapeSql(name)}%'
+            </if>
+            <if test=" onsaleStatus != null ">
+                and onsale_status = #{onsaleStatus}
+            </if>
+		</where>
+	</select>
+	
+	<select id="selectGoodsAllList" resultMap="BaseGoodMap">
+		select * from ykj_storage_goods 
+		<where>
+			<if test=" name != null ">
+				and name = #{name}
+			</if>
+			<if test=" onsaleStatus != null ">
+				and onsale_status = #{onsaleStatus}
+			</if>
+		</where>
+		<if test=" orderList != null ">
+		<foreach collection="orderList" index="index" item="orderItem" open="order by " separator="," close="">
+			  #{orderItem}
+		</foreach>
+		</if>
+	</select>
+	
+	<select id="isExists" resultType="java.lang.Integer">
+	   select count(1) from ykj_storage_goods where model = #{model} and business_id = #{businessId}
+	   <if test="originValue != null">
+	       and model != #{originValue}
+	   </if>
+	   limit 1
+	</select>
+	
+	<select id="useInOrder" resultType="java.lang.Integer">
+	   select count(1) from ykj_order_goods where storage_goods_id = #{storageGoodsId} limit 1
+	</select>
+	
+	<select id="findByIds" resultMap="BaseGoodMap">
+       select * from ykj_storage_goods where id in 
+       <foreach collection="ids" item="id" separator="," open="(" close=")">
+           #{id}
+       </foreach>
+    </select>
+</mapper>

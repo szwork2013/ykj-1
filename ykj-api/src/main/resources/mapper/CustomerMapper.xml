@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gnet.app.customer.CustomerMapper" >
+    <resultMap id="BaseCustomerMapper" type="com.gnet.app.customer.Customer" >
+        <id column="id" property="id" jdbcType="CHAR" />
+        <result column="customer_responsible_id" property="customerResponsibleId" jdbcType="CHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="sex" property="sex" jdbcType="INTEGER"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="phone_sec" property="phoneSec" jdbcType="VARCHAR" />
+        <result column="need_product" property="needProduct" jdbcType="VARCHAR"/>
+        <result column="need_time" property="needTime" jdbcType="INTEGER" />
+        <result column="wechat" property="wechat" jdbcType="VARCHAR"/>
+        <result column="qq" property="qq" jdbcType="VARCHAR"/>
+        <result column="email" property="email" jdbcType="VARCHAR" />
+        <result column="address" property="address" jdbcType="VARCHAR"/>
+        <result column="organization" property="organization" jdbcType="VARCHAR"/>
+        <result column="create_date" property="createDate"/>
+        <result column="modify_date" property="modifyDate"/>
+        <result column="is_effectivity" property="isEffectivity" jdbcType="BIT"/>
+        <result column="is_del" property="isDel" jdbcType="BIT"/>
+        <result column="business_id" property="businessId" jdbcType="CHAR"/>
+        <result column="origin_type" property="originType" jdbcType="INTEGER"/>
+        <result column="customerResponsibleName" property="customerResponsibleName" jdbcType="VARCHAR"/>
+        <result column="buildingName" property="buildingName" jdbcType="VARCHAR"/>
+        <result column="decorateType" property="decorateType" jdbcType="INTEGER"/>
+    </resultMap>
+    
+    <select id="selectAllByOfficeId" resultMap="BaseCustomerMapper">
+       select yc.*, ychp.building_name buildingName, ychp.decorate_type decorateType, yjc.name customerResponsibleName from ykj_customer yc
+       left join ykj_customer_house_property ychp on ychp.customer_id = yc.id
+       left join ykj_clerk yjc on yjc.id = yc.customer_responsible_id
+       <if test="@com.gnet.app.clerk.Clerk@ROLE_TYPE_ADMIN == roleType or @com.gnet.app.clerk.Clerk@ROLE_TYPE_MANAGER == roleType or @com.gnet.app.clerk.Clerk@ROLE_TYPE_LOGISTIC
+       == roleType or @com.gnet.app.clerk.Clerk@ROLE_TYPE_WAREHOUSE == roleType or @com.gnet.app.clerk.Clerk@ROLE_TYPE_AFTER_SALES == roleType ">
+       where yjc.business_id = #{officeId} and yjc.is_del = 0 and yc.is_del = 0
+       </if>
+       <if test="@com.gnet.app.clerk.Clerk@ROLE_TYPE_STORE_MANAGER == roleType">
+       where yc.store_id = #{officeId} and yjc.is_del = 0 and yc.is_del = 0
+       </if>
+       <if test="name != null">
+       and yc.name like "${@com.gnet.utils.string.StringEscapeUtils@escapeSql(name)}%"
+       </if>
+       <if test="phone != null">
+       and yc.phone like "${@com.gnet.utils.string.StringEscapeUtils@escapeSql(phone)}%"
+       </if>
+       <if test="buildingName != null">
+       and ychp.building_name like "${@com.gnet.utils.string.StringEscapeUtils@escapeSql(buildingName)}%"
+       </if>
+       group by yc.id
+    </select>
+    
+    <select id="selectAllById" resultMap="BaseCustomerMapper">
+       select yc.*, ychp.building_name buildingName, ychp.decorate_type decorateType, yjc.name customerResponsibleName from ykj_customer yc
+       left join ykj_customer_house_property ychp on ychp.customer_id = yc.id
+       left join ykj_clerk yjc on yjc.id = yc.customer_responsible_id
+       where yjc.id = #{id} and yjc.is_del = 0 and yc.is_del = 0
+       <if test="name != null">
+       and yc.name like "${@com.gnet.utils.string.StringEscapeUtils@escapeSql(name)}%"
+       </if>
+       <if test="phone != null">
+       and yc.phone like "${@com.gnet.utils.string.StringEscapeUtils@escapeSql(phone)}%"
+       </if>
+       <if test="buildingName != null">
+       and ychp.building_name like "${@com.gnet.utils.string.StringEscapeUtils@escapeSql(buildingName)}%"
+       </if>
+       group by yc.id
+    </select>
+    
+    <select id="selectOneById" resultMap="BaseCustomerMapper">
+       select yc.*, yjc.name customerResponsibleName from ykj_customer yc
+       left join ykj_clerk yjc on yjc.id = yc.customer_responsible_id
+       where yc.id = #{id} and yc.is_del = 0 and yjc.is_del = 0   
+    </select>
+        
+    <select id="isCreateExist" resultType="Integer">
+       select count(1) from ykj_customer where name = #{name} and phone = #{phone} and business_id = #{businessId} and is_del = 0
+    </select>
+    
+    <select id="isUpdateExist" resultType="Integer">
+       select count(1) from ykj_customer where name = #{name} and name != #{oldName} and phone = #{phone} and phone != #{oldPhone} and business_id = #{businessId}
+       and is_del = 0
+    </select>
+        
+    <update id="deleteById">
+    update ykj_customer set modify_date = #{date}, is_del = 1 where id = #{id} 
+    </update>  
+</mapper>

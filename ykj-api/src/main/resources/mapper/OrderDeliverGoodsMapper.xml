@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gnet.app.orderDeliverGoods.OrderDeliverGoodsMapper" >
+    <resultMap id="BaseOrderDeliverGoodsMap" type="com.gnet.app.orderDeliverGoods.OrderDeliverGoods" >
+        <id column="id" property="id" jdbcType="CHAR" />
+		<result column="order_deliver_service_id" property="orderDeliverServiceId" jdbcType="CHAR"/>
+		<result column="deliver_num" property="deliverNum" jdbcType="INTEGER"/>
+		<result column="remark" property="remark" jdbcType="VARCHAR"/>
+		<result column="position" property="position" jdbcType="VARCHAR"/>
+		<result column="create_date" property="createDate" />
+		<result column="order_goods_id" property="orderGoodsId" jdbcType="CHAR"/>
+		<result column="modify_date" property="modifyDate" />
+		<result column="goodName" property="goodName" jdbcType="VARCHAR"></result>
+		<result column="goodModel" property="goodModel" jdbcType="VARCHAR"></result>
+		<result column="goodUnit" property="goodUnit" jdbcType="INTEGER"></result>
+		<result column="orderNum" property="orderNum" jdbcType="INTEGER"></result>
+		<result column="needDeliverNum" property="needDeliverNum" jdbcType="INTEGER"></result>
+		<result column="storeNow" property="storeNow" jdbcType="INTEGER"></result>
+    </resultMap>
+    
+   <insert id="batchSave">
+        insert into ykj_order_deliver_goods (id, create_date, modify_date, order_goods_id, order_deliver_service_id, deliver_num, position, remark) values
+        <foreach collection="serviceGoods" item="good" separator=",">
+            (uuid(), #{date}, #{date}, #{good.orderGoodsId}, #{serviceId}, #{good.deliverNum}, #{good.position}, #{good.remark})
+        </foreach>
+   </insert>
+   
+   <select id="findAllList" resultMap="BaseOrderDeliverGoodsMap">
+   select yodg.*, ysgt.store_now storeNow, ysg.name goodName, ysg.model goodModel, ysg.unit goodUnit, yog.order_goods_num orderNum, yog.need_deliver_num needDeliverNum from ykj_order_deliver_goods yodg
+   left join ykj_order_goods yog on yog.id = yodg.order_goods_id
+   left join ykj_storage_goods ysg on ysg.id = yog.storage_goods_id
+   left join ykj_storage_goods_status ysgt on ysgt.id = ysg.id
+   where yodg.order_deliver_service_id = #{serviceId}
+   <if test="orderList != null">
+    <foreach item="orderItem" collection="orderList" open="order by " separator="," close="" >
+    {orderItem}
+    </foreach>
+   </if>
+   </select>
+   
+   <select id="selectAllList" resultMap="BaseOrderDeliverGoodsMap">
+   select yodg.*, ysgt.store_now storeNow, ysg.name goodName, ysg.model goodModel, ysg.unit goodUnit, yog.order_goods_num orderNum, yog.need_deliver_num needDeliverNum from ykj_order_deliver_goods yodg
+   left join ykj_order_goods yog on yog.id = yodg.order_goods_id
+   left join ykj_storage_goods ysg on ysg.id = yog.storage_goods_id
+   left join ykj_storage_goods_status ysgt on ysgt.id = ysg.id
+   where yodg.order_deliver_service_id = #{serviceId}
+   </select>
+   
+   <delete id="deleteAll">
+   delete from ykj_order_deliver_goods where id in
+   <foreach item="good" collection="orderDeliverGoods" open="(" separator="," close=")" >
+   #{good.id}
+   </foreach>
+   </delete>
+   
+</mapper>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gnet.app.customerHouseProperty.CustomerHousePropertyMapper" >
+    <resultMap id="CustomerHousePropertyMap" type="com.gnet.app.customerHouseProperty.CustomerHouseProperty" >
+        <id column="id" property="id" jdbcType="CHAR" />
+        <result column="create_date" property="createDate" />
+        <result column="modify_date" property="modifyDate" />
+        <result column="customer_id" property="customerId" jdbcType="CHAR"/>
+        <result column="building_name" property="buildingName" jdbcType="VARCHAR"/>
+        <result column="building_no" property="buildingNo" jdbcType="VARCHAR"/>
+        <result column="room_style" property="roomStyle" jdbcType="INTEGER"/>
+        <result column="decorate_process" property="decorateProcess" jdbcType="INTEGER"/>
+        <result column="decorate_type" property="decorateType" jdbcType="INTEGER"/>
+        <result column="room_model" property="roomModel" jdbcType="INTEGER"/>
+        <result column="building_position" property="buildingPosition" jdbcType="VARCHAR"/>
+        <result column="area" property="area" jdbcType="INTEGER"/>
+    </resultMap>
+    
+    <select id="findCustomerHouses" resultMap="CustomerHousePropertyMap">
+    select * from ykj_customer_house_property where customer_id = #{customerId}
+    </select>
+    
+</mapper>

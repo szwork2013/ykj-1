@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gnet.app.store.StoreMapper" >
+    <resultMap id="BaseStoreMap" type="com.gnet.app.store.Store" >
+        <id column="id" property="id" jdbcType="CHAR" />
+        <result column="create_date" property="createDate" />
+        <result column="modify_date" property="modifyDate" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="contact_number" property="contactNumber" jdbcType="VARCHAR"/>
+        <result column="contact_person" property="contactPerson" jdbcType="VARCHAR"/>
+        <result column="address" property="address" jdbcType="VARCHAR"/>
+        <result column="business_id" property="businessId" jdbcType="CHAR" />
+        <result column="is_del" property="isDel" jdbcType="VARCHAR"/>     
+    </resultMap>
+    
+    <select id="findAllByBusinessId" resultMap="BaseStoreMap">
+    select * from ykj_store where business_id = #{businessId} and is_del = 0
+    <if test="orderList != null">
+    <foreach item="orderItem" collection="orderList" open="order by " separator="," close="" >
+    {orderItem}
+    </foreach>
+    </if>
+    </select>
+    
+    <select id="selectAllByBusinessId" resultMap="BaseStoreMap">
+    select * from ykj_store where business_id = #{businessId} and is_del = 0
+    </select>
+    
+    <select id="findById" resultMap="BaseStoreMap">
+    select * from ykj_store where id = #{id} and is_del = 0
+    </select>
+        
+    <select id="isCreateExist" resultType="Integer">
+    select count(1) from ykj_store where business_id = #{businessId} and name = #{name} 
+    </select>
+    
+    <select id="isModifyExist" resultType="Integer">
+    select count(1) from ykj_store where business_id = #{businessId} and name = #{name} and name != #{oldName}
+    and is_del = 0;
+    </select>
+   
+    <update id="deleteById">
+    update ykj_store set modify_date = #{date}, is_del = 1 where id = #{id} 
+    </update>
+</mapper>
