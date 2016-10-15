@@ -1,0 +1,77 @@
+[
+  {
+    "id": 1,
+    "name": "订单来源", 
+    "value": "ORDER_SOURCE"
+  },
+  {
+    "id": 2,
+    "name": "订单付款类型", 
+    "value": "ORDER_PAYMENT_TYPE"
+  },
+  {
+    "id": 3,
+    "name": "付款方式", 
+    "value": "PAYMENT_WAY"
+  },
+  {
+    "id": 4,
+    "name": "库存计价单位", 
+    "value": "STORAGE_UNIT"
+  },
+  {
+    "id": 5,
+    "name": "库存计价最小单位", 
+    "value": "STORAGE_ATOM_UNIT"
+  },
+  {
+    "id": 6,
+    "name": "购物需求", 
+    "value": "CUSTOMER_NEED_TIME"
+  },
+  {
+    "id": 7,
+    "name": "客户来源", 
+    "value": "CUSTOMER_SOURCE"
+  },
+  {
+    "id": 8,
+    "name": "装修类型", 
+    "value": "DECORATE_TYPE"
+  },
+  {
+    "id": 9,
+    "name": "户型", 
+    "value": "HOUSE_TYPE"
+  },
+  {
+    "id": 10,
+    "name": "装修风格", 
+    "value": "DECORATE_STYLE"
+  },
+  {
+    "id": 11,
+    "name": "跟进方式", 
+    "value": "TRACK_WAY"
+  },
+  {
+    "id": 12,
+    "name": "客户类型", 
+    "value": "CUSTOMER_TYPE"
+  },
+  {
+    "id": 13,
+    "name": "商品类别", 
+    "value": "GOOD_CATEGORY"
+  },
+  {
+    "id": 14,
+    "name": "性别", 
+    "value": "SEX"
+  },
+  {
+    "id": 15,
+    "name": "装修进度", 
+    "value": "DECORATE_PROCESS"
+  }
+]

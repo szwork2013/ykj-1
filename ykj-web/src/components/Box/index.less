@@ -1,0 +1,41 @@
+@import "~antd/lib/style/themes/default.less";
+
+.box {
+  background: #fff;
+  border-radius: @border-radius-sm;
+  font-size: @font-size-base;
+  position: relative;
+  overflow: hidden;
+  transition: all .3s;
+  border: 1px solid @border-color-base;
+  border-color: @border-color-split;
+  margin-bottom: 20px;
+  .box-head {
+    height: 48px;
+    line-height: 48px;
+    padding: 0 24px;
+    .box-head-title {
+      font-size: 14px;
+      display: inline-block;
+      text-overflow: ellipsis;
+      width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .toolbar-wrapper {
+      text-align: right;
+      > div > button {
+        margin-right: 5px;
+        margin-left: 5px;
+      }
+    }
+  }
+  .box-body {
+    padding: 24px;
+  }
+}
+.box.no-padding {
+  .box-body {
+    padding: 0px!important;
+  }
+}
